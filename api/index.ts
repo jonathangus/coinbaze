@@ -17,6 +17,8 @@ declare module "coinbase-pro" {
 
 const cryptoMap = {
   btc: "BTC-EUR",
+  eth: "ETH-EUR",
+  ltc: "LTC-EUR",
 };
 
 const purchase = async ({ crypto, passphrase, amount }) => {
