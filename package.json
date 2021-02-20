@@ -11,6 +11,8 @@
   "dependencies": {
     "coinbase-pro": "^0.9.0",
     "decimal.js": "^10.2.1",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "invariant": "^2.2.4",
+    "vercel": "^21.2.3"
   }
 }
