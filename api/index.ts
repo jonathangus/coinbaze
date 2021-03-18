@@ -39,7 +39,7 @@ const purchase = async ({
     passphrase,
     apiURI
   );
-  const order = {
+  const order: any = {
     side: 'buy',
     funds: amount,
     product_id: crypto,
@@ -52,12 +52,14 @@ const purchase = async ({
 };
 
 export default async (req: NowRequest, res: NowResponse) => {
-  console.log('body', req.body);
+  console.log('query', req.query);
+  const query: Record<string, string> = req.query as Record<string, string>;
+
   try {
-    invariant(req.method === 'POST', 'Only POST supported');
-    invariant(typeof req.body?.passphrase === 'string', 'Missing passphrase');
-    invariant(req.body?.amount, 'Missing amount');
-    invariant(cryptoMap[req.body?.crypto], 'Did not find supported crypto');
+    invariant(req.method === 'GET', 'Only GET supported');
+    invariant(typeof query?.passphrase === 'string', 'Missing passphrase');
+    invariant(query?.amount, 'Missing amount');
+    invariant(cryptoMap[query?.crypto], 'Did not find supported crypto');
   } catch (e) {
     console.error(e.message);
     return res.status(400).send(e.message);
@@ -65,12 +67,12 @@ export default async (req: NowRequest, res: NowResponse) => {
 
   try {
     await purchase({
-      passphrase: req.body.passphrase,
+      passphrase: query.passphrase,
       amount:
-        typeof req.body.amount === 'number'
-          ? req.body.amount
-          : parseInt(req.body.amount),
-      crypto: cryptoMap[req.body.crypto],
+        typeof query.amount === 'number'
+          ? query.amount
+          : parseInt(query.amount),
+      crypto: cryptoMap[query.crypto],
     });
     return res.status(200).send('Success');
   } catch (e) {
