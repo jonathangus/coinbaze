@@ -1,9 +1,11 @@
 import { NowRequest, NowResponse } from '@vercel/node';
 import CoinbasePro from 'coinbase-pro';
 import invariant from 'invariant';
+import axios from 'axios';
 
 const key = process.env.API_KEY || '';
 const secret = process.env.SECRET || '';
+const slackUrl = process.env.SLACK_WEBHOOK_URL || '';
 
 const apiURI = 'https://api.pro.coinbase.com';
 
@@ -13,6 +15,44 @@ declare module 'coinbase-pro' {
     getPaymentMethods: () => PaymentMethod[];
   }
 }
+
+const postMessageToSlack = (text: string, markdown: any) => {
+  const body = {
+    text,
+    blocks: [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: text,
+        },
+      },
+    ],
+  };
+
+  if (markdown) {
+    body.blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '```' + JSON.stringify(markdown) + '```',
+      },
+    });
+  }
+
+  return axios
+    .post(slackUrl, JSON.stringify(body), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
+      console.log('SUCCEEDED: Sent slack webhook: \n', response.data);
+    })
+    .catch((error) => {
+      console.log('FAILED: Send slack webhook', error.message);
+    });
+};
 
 const cryptoMap: Record<string, string> = {
   btc: 'BTC-EUR',
@@ -47,7 +87,12 @@ const purchase = async ({
   };
 
   console.log(order);
+
   const response = await client.placeOrder(order);
+  await postMessageToSlack(
+    `✅ ✅ ✅ ✅ ✅  Purchased ${crypto} for ${amount}`,
+    response
+  );
   console.log(response);
 };
 
@@ -77,6 +122,12 @@ export default async (req: NowRequest, res: NowResponse) => {
     return res.status(200).send('Success');
   } catch (e) {
     console.error(e);
-    return res.status(400).send(e.data.message);
+    await postMessageToSlack(
+      `❌ ❌ ❌ ❌ ❌ Failed buying ${cryptoMap[query?.crypto]} for ${
+        query?.amount
+      }`,
+      e
+    );
+    return res.status(400).send(e?.data?.message || 'Error');
   }
 };
