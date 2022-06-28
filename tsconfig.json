@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "outDir": "out",
     "target": "es5",
     "module": "commonjs",
     "lib": ["es2015"],
     "esModuleInterop": true
   },
-  "files": ["api/index.ts"]
+  "files": ["main.ts"]
 }

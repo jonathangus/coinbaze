@@ -8,19 +8,19 @@
   "dependencies": {
     "axios": "^0.21.1",
     "coinbase-pro": "^0.9.0",
-    "decimal.js": "^10.2.1",
-    "dotenv": "^8.2.0",
-    "invariant": "^2.2.4"
+    "dotenv": "^8.2.0"
   },
-  "scripts": {},
+  "scripts": {
+    "dev": "ts-node index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
   "devDependencies": {
     "@vercel/node": "^1.9.0",
+    "ts-node": "^10.8.1",
     "vercel": "^21.2.3"
   },
   "prettier": {
     "singleQuote": true
-  },
-  "engines": {
-    "node": "14.x"
   }
 }
